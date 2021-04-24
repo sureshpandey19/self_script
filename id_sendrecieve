@@ -1,0 +1,45 @@
+#!/bin/bash
+#script for sending packet 
+dbip=192.168.150.10
+dbname=mamcdb_pp_demo
+dbuser=sw_testing
+dbpass=Swtesting@123
+log=/home/mam/idsend.log
+
+count=$(mysql -h $dbip $dbname -u $dbuser -p$dbpass 2>/dev/null -se "SELECT count(CONCAT(clipid,ext)) FROM process WHERE operationid = 1 AND sourcedeviceid = '1a2ff96c-8480-42bb-895d-3a4def03bf13'")
+
+j=1
+while [[ $j -ne 0 ]]
+do
+idname=$(mysql -h $dbip $dbname -u $dbuser -p$dbpass 2>/dev/null -se "SELECT CONCAT(clipid,ext) FROM process WHERE operationid = 1 AND sourcedeviceid = '1a2ff96c-8480-42bb-895d-3a4def03bf13'")
+for i in $idname
+do
+
+echo -n "$i,TRANSFER," | nc -u 192.168.150.10 1011
+#id=$(echo -n "$i,TRANSFER," | nc -u 192.168.150.10 1011 2> /dev/null | cut -d ',' -f 1)
+#status=$(echo -n "$i,TRANSFER," | nc -u 192.168.150.10 1011 2> /dev/null | cut -d ',' -f 2)
+
+sleep 2
+echo "id name is $i and its status is "TRANSFER" information sent" #| tee -a $log
+
+
+id=$(echo -n "$i,TRANSFER," | nc -ul 1211 2> /dev/null | cut -d ',' -f 1)
+status=$(echo -n "$i,TRANSFER," | nc -ul 1211 2> /dev/null | cut -d ',' -f 2)
+if [[ $id == $i ]] && [[ $status == "DONE" ]]
+then
+echo "Done status recieved"
+echo "id name is $id and status is "DONE" "
+#mysql -h $dbip $dbname -u $dbuser -p$dbpass 2>/dev/null -se "update process set completestatus = 2 WHERE operationid = 1 and clipid = $id AND sourcedeviceid = '1a2ff96c-8480-42bb-895d-3a4def03bf13'"
+else
+echo "No any response recieved"
+
+fi
+
+done
+count=$(mysql -h $dbip $dbname -u $dbuser -p$dbpass 2>/dev/null -se "SELECT count(CONCAT(clipid,ext)) FROM process WHERE operationid = 1 AND sourcedeviceid = '1a2ff96c-8480-42bb-895d-3a4def03bf13'")
+if [[ $count -eq 0 ]]
+then
+echo "Nothing for transfer"
+fi
+done
+

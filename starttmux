@@ -1,0 +1,38 @@
+#!/bin/sh
+
+session=mam.services
+path=/var/mam/saas
+mampid=/home/mam/1.txt
+x=$(tmux ls | awk '{ print $1 }' | tr -d :)
+
+
+tmux ls | grep $session
+if [ $? -eq 0 ]
+then
+   echo "Tmux Already running"
+   echo -e "Tmux Running Services Name is : \n\e[42m$x\e[0m"
+else
+	 echo "Tmux Not Found Running..."
+	tmux new-session -d -s $session
+  	tmux split-window -h -p 30 -t ${session}:0.0
+	tmux split-window -h -p 30 -t ${session}:0.0
+	tmux split-window -h -p 30 -t ${session}:0.0
+	tmux split-window -h -p 30 -t ${session}:0.0
+	tmux split-window -h -p 30 -t ${session}:0.0
+	tmux split-window -h -p 30 -t ${session}:0.0
+	tmux split-window -h -p 30 -t ${session}:0.0
+	tmux split-window -h -p 30 -t ${session}:0.0
+	tmux split-window -h -p 30 -t ${session}:0.0
+	tmux select-layout tiled
+	tmux send-keys -t ${session}:0.0 "cd $path/mam.log/" C-m "./logwriter"  C-m
+	echo a `ps aux | awk '/logwriter/ && !/awk/ { print $2 }'` > $mampid
+	tmux send-keys -t ${session}:0.1 "cd $path/mam.db/" C-m "./dbservices"  C-m
+	echo b `ps aux | awk '/dbservice/ && !/awk/ { print $2 }'` >> $mampid
+	tmux send-keys -t ${session}:0.2 "cd $path/mam.server/" C-m "./mamserver"  C-m
+	echo c `ps aux | awk '/mamserver/ && !/awk/ { print $2 }'` >> $mampid
+	tmux send-keys -t ${session}:0.3 "cd $path/mam.gui/" C-m "./mamgui"  C-m
+	echo d `ps aux | awk '/mamgui/ && !/awk/ { print $2 }'` >> $mampid
+	tmux send-keys -t ${session}:0.4 "cd $path/mam.opr/" C-m "./mamoperation"  C-m
+	echo e `ps aux | awk '/mamoperation/ && !/awk/ { print $2 }'` >> $mampid
+
+fi

@@ -1,0 +1,20 @@
+#!/bin/bash
+basepath=/var/mam
+destpath=/home/mam
+read -p "Please Enter source path: " src
+if [[ -d $basepath/$src ]] && [[ -d $destpath/ ]]
+then
+echo "Source and Destination are valid directories"
+read -p "Enter tar file name: " $tarname
+tar cvzf $destpath/$dest/$tarname.tar.gz $basepath/$src/ 
+tar tvf $destpath/$dest/$tarname.tar.gz
+if [[ $? -eq 0 ]]
+then
+echo "tar file successfully created and verified!"
+else
+echo "tar error generated!"
+fi
+else
+echo "Source or destination are not valid path!"
+fi
+

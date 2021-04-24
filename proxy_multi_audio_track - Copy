@@ -1,0 +1,49 @@
+#!/bin/bash
+source=/home/mam/video
+dest=/home/mam/proxy
+move=/home/mam/proxydone
+path=$(which ffmpeg)
+ids=$(ls -ltr $source | awk '{ print $9 }')
+
+
+
+if [[ -n $ids ]]
+then
+echo "id available at source for proxy generation!"
+for i in $ids 
+do
+i=$(ls -ltr /home/mam/video/ | awk -F . '{ print $1 }' | awk 'NR == 2 { print $9 }')
+ext=$(ls -ltr /home/mam/video/ | awk -F . ' NR == 2 { print $2 }')
+echo "source file name: $i.$ext"
+sleep 10
+
+if [[ -e $source/$i.$ext ]]
+then
+
+ $path -i "$source/$i.$ext" -y -r 25 -b:v 1024k  -c:v libx264  -s 620:460 -an "$dest/$i.mp4"; /sbin/ffmpeg -i "$source/$i" -y -r 25 -b:v 1024k  -c:v libx264  -s 620:460 -an "$dest/$i.mp4"; $path  -i "$source/$i.$ext" -y  -vn -c:a mp3 -b:a 64k   -map 0:1 -ac 1 "$dest/${i}_01.mp3"; $path  -i "$source/$i.$ext" -y  -vn -c:a mp3 -b:a 64k   -map 0:2 -ac 1 "$dest/${i}_02.mp3"; $path  -i "$source/$i.$ext" -y  -vn -c:a mp3 -b:a 64k   -map 0:3 -ac 1 "$dest/${i}_03.mp3"; $path  -i "$source/$i.$ext" -y  -vn -c:a mp3 -b:a 64k   -map 0:4 -ac 1 "$dest/${i}_04.mp3"; $path  -i "$source/$i.$ext" -y  -vn -c:a mp3 -b:a 64k   -map 0:5 -ac 1 "$dest/${i}_05.mp3"; $path  -i "$source/$i.$ext" -y  -vn -c:a mp3 -b:a 64k   -map 0:5 -ac 1 "$dest/${i}_06.mp3"; $path  -i "$source/$i.$ext" -y  -vn -c:a mp3 -b:a 64k   -map 0:7 -ac 1 "${i}_07.mp3"; $path  -i "$source/$i.$ext" -y  -vn -c:a mp3 -b:a 64k   -map 0:8 -ac 1 "$dest/${i}_08.mp3"; $path -i "$source/$i.$ext" -vf  'thumbnail,scale=640:360' -frames:v 1  -y "$dest/$i.jpg";
+
+if [[ -e $dest/$i.mp4 ]]
+then
+
+echo "proxy generated!"
+mv $source/$i.$ext $move
+else
+echo "proxy failed to generate!"
+fi
+
+else
+echo "file not available!"
+fi
+
+
+
+
+
+
+done
+
+else
+
+echo "No id available at source"
+
+fi

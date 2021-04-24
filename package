@@ -1,0 +1,48 @@
+#!/bin/bash
+#Package installation script
+
+if [[ $(id -u) -eq 0 ]]
+then
+   echo "You have root previlige"
+else
+   echo "you dont not have right to install apckages!"
+   exit 2
+fi
+
+
+
+
+if [[ $# -eq 0 ]]
+then
+   echo "Please put some argument at after script name: $0 pkg1 pkg2 pkg3 ..etc"
+else
+   echo "We are ready to install packages: $@"
+   for each_pkg in $@
+   do
+     if which $each_pkg &> /dev/null 
+     then 
+       echo "$each_pkg Package already found Installed"
+     else
+          echo "We are installing ${each_pkg}..."
+          yum install $each_pkg -y &> /dev/null
+       if [[ $? -eq 0 ]]
+       then
+            stats=$(yum install tcl* | grep -E "Nothing to do")
+              if [[ $stats == "Nothing to do" ]]
+              then
+                echo "$each_pkg Package already found installed!"   
+              else
+                echo "$each_pkg Package installed successfully"
+                sleep 1
+              fi
+       else
+         echo "Installation failed!"
+       fi
+
+     fi
+
+  done
+
+fi
+
+
