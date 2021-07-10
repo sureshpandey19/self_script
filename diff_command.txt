@@ -1,0 +1,1 @@
+diff <(ls -1 /Video3/enter10/txmaster/ | sed s/.mov//g) <(ls -1 /Video3/enter10/txproxy/ | sed s/.mp4//g | sed s/.jpg//g | sed s/_key//g | sort | uniq) | awk '{print $2}' | awk '!/^$/'
